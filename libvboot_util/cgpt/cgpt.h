@@ -12,7 +12,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __ANDROID__
+#include <linux/fs.h>
+#else
 #include "cgpt_endian.h"
+#endif
 #include "cgptlib.h"
 #include "gpt.h"
 
