@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#ifndef HAVE_MACOS
+#if !defined(HAVE_MACOS) && !defined(__CYGWIN__)
 #include <linux/major.h>
 #include <mtd/mtd-user.h>
 #endif
@@ -267,7 +267,7 @@ static int ObtainDriveSize(int fd, uint64_t* size, uint32_t* sector_bytes) {
   if (fstat(fd, &stat) == -1) {
     return -1;
   }
-#ifndef HAVE_MACOS
+#if !defined(HAVE_MACOS) && !defined(__CYGWIN__)
   if ((stat.st_mode & S_IFMT) != S_IFREG) {
     if (ioctl(fd, BLKGETSIZE64, size) < 0) {
       return -1;
@@ -297,7 +297,7 @@ int DriveOpen(const char *drive_path, struct drive *drive, int mode,
   memset(drive, 0, sizeof(struct drive));
 
   drive->fd = open(drive_path, mode | 
-#ifndef HAVE_MACOS
+#if !defined(HAVE_MACOS) && !defined(__CYGWIN__)
 		               O_LARGEFILE |
 #endif
 			       O_NOFOLLOW);
@@ -1021,6 +1021,6 @@ void PMBRToStr(struct pmbr *pmbr, char *str, unsigned int buflen) {
 
 /* Optional */
 int __GenerateGuid(Guid *newguid) { return CGPT_FAILED; };
-#ifndef HAVE_MACOS
+#if !defined(HAVE_MACOS) && !defined(__CYGWIN__)
 int GenerateGuid(Guid *newguid) __attribute__((weak, alias("__GenerateGuid")));
 #endif

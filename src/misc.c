@@ -6,7 +6,11 @@
 
 #include <errno.h>
 #ifndef HAVE_MACOS
+#ifdef __CYGWIN__
+#include <cygwin/fs.h>		/* For BLKGETSIZE64 */
+#else
 #include <linux/fs.h>		/* For BLKGETSIZE64 */
+#endif
 #endif
 #include <stdarg.h>
 #include <stdint.h>
