@@ -51,7 +51,7 @@ libvboot_util.a:
 	make -C libvboot_util
 
 futility$(EXE):$(OBJS)
-	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto $(LDFLAGS) -s
+	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto -ldl $(LDFLAGS) -s
 
 futility-static$(EXE):$(OBJS)
 	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto_static $(LDFLAGS) -static -s
