@@ -6,6 +6,7 @@
  * equivalents.
  */
 
+#include <assert.h>
 #include <stdint.h>
 
 #define _STUB_IMPLEMENTATION_
