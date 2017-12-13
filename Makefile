@@ -38,6 +38,11 @@ OBJS = \
 	src/vb1_helper.o \
 	src/futility_cmds.o
 
+ifneq (,$(findstring android,$(CROSS_COMPILE)))
+    LDFLAGS += -lcrypto_static
+else
+    LDFLAGS += -lcrypto -ldl
+endif
 ifneq (,$(findstring darwin,$(CROSS_COMPILE)))
     UNAME_S := Darwin
 else
@@ -50,16 +55,17 @@ else
     LDFLAGS += -Wl,--gc-sections -s
 endif
 
+
 all:libvboot_util.a futility$(EXE)
 
 static:
-	make LDFLAGS="$(LDGLAGS) -static"
+	make LDFLAGS="$(LDFLAGS) -static"
 
 libvboot_util.a:
 	make -C libvboot_util
 
 futility$(EXE):$(OBJS)
-	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto -ldl $(LDFLAGS)
+	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util $(LDFLAGS)
 
 %.o:%.c
 	$(CROSS_COMPILE)$(CC) -o $@ $(CFLAGS) -c $< $(INC)
