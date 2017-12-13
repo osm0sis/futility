@@ -1,4 +1,6 @@
+ifeq ($(CC),cc)
 CC = gcc
+endif
 AR = ar rcv
 ifeq ($(windir),)
 EXE =
@@ -36,31 +38,34 @@ OBJS = \
 	src/vb1_helper.o \
 	src/futility_cmds.o
 
-UNAME_S := $(shell uname -s)
+ifneq (,$(findstring darwin,$(CROSS_COMPILE)))
+    UNAME_S := Darwin
+else
+    UNAME_S := $(shell uname -s)
+endif
 ifeq ($(UNAME_S),Darwin)
+    CFLAGS += -DHAVE_MACOS
     LDFLAGS += -Wl,-dead_strip
 else
-    LDFLAGS += -Wl,--gc-sections
+    LDFLAGS += -Wl,--gc-sections -s
 endif
 
 all:libvboot_util.a futility$(EXE)
 
-static:libvboot_util.a futility-static$(EXE)
+static:
+	make LDFLAGS="$(LDGLAGS) -static"
 
 libvboot_util.a:
 	make -C libvboot_util
 
 futility$(EXE):$(OBJS)
-	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto -ldl $(LDFLAGS) -s
-
-futility-static$(EXE):$(OBJS)
-	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto_static $(LDFLAGS) -static -s
+	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util -lcrypto -ldl $(LDFLAGS)
 
 %.o:%.c
 	$(CROSS_COMPILE)$(CC) -o $@ $(CFLAGS) -c $< $(INC)
 
 clean:
-	$(RM) futility futility-static futility.exe futility-static.exe
-	$(RM) $(OBJS) libvboot_util.a Makefile.~
+	$(RM) futility
+	$(RM) $(OBJS) *.a *.~ *.exe
 	make -C libvboot_util clean
 

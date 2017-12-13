@@ -1,4 +1,6 @@
+ifeq ($(CC),cc)
 CC = gcc
+endif
 AR = ar rc
 ifeq ($(windir),)
 RM = rm -f
@@ -76,6 +78,15 @@ LIB_OBJS = \
 	host/util_misc.o \
 	host/host_signature.o \
 	host/signature_digest.o
+
+ifneq (,$(findstring darwin,$(CROSS_COMPILE)))
+    UNAME_S := Darwin
+else
+    UNAME_S := $(shell uname -s)
+endif
+ifeq ($(UNAME_S),Darwin)
+    CFLAGS += -DHAVE_MACOS
+endif
 
 all:$(LIB)
 
