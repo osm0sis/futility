@@ -49,7 +49,6 @@ else
     UNAME_S := $(shell uname -s)
 endif
 ifeq ($(UNAME_S),Darwin)
-    CFLAGS += -DHAVE_MACOS
     LDFLAGS += -Wl,-dead_strip
 else
     LDFLAGS += -Wl,--gc-sections -s
