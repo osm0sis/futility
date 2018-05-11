@@ -60,13 +60,6 @@ LIB_OBJS = \
 	stub/vboot_api_stub.o \
 	stub/vboot_api_stub_disk.o \
 	stub/vboot_api_stub_stream.o \
-	cgpt/cgpt_create.o \
-	cgpt/cgpt_add.o \
-	cgpt/cgpt_boot.o \
-	cgpt/cgpt_show.o \
-	cgpt/cgpt_repair.o \
-	cgpt/cgpt_prioritize.o \
-	cgpt/cgpt_common.o \
 	futility/dump_kernel_config_lib.o \
 	host/crossystem.o \
 	host/file_keys.o \
