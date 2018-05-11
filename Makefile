@@ -56,15 +56,15 @@ else
 endif
 
 
-all:libvboot_util.a futility$(EXE)
+all:futility$(EXE)
 
 static:
-	make LDFLAGS="$(LDFLAGS) -static"
+	$(MAKE) LDFLAGS="$(LDFLAGS) -static"
 
 libvboot_util.a:
-	make -C libvboot_util
+	$(MAKE) -C libvboot_util
 
-futility$(EXE):$(OBJS)
+futility$(EXE):$(OBJS) libvboot_util.a
 	$(CROSS_COMPILE)$(CC) -o $@ $^ -L. -lvboot_util $(LDFLAGS)
 
 %.o:%.c
@@ -73,5 +73,5 @@ futility$(EXE):$(OBJS)
 clean:
 	$(RM) futility
 	$(RM) $(OBJS) *.a *.~ *.exe
-	make -C libvboot_util clean
+	$(MAKE) -C libvboot_util clean
 
