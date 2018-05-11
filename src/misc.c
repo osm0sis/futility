@@ -5,13 +5,15 @@
  */
 
 #include <errno.h>
-#ifndef HAVE_MACOS
-#ifdef __CYGWIN__
+
+#if defined(__CYGWIN__)
 #include <cygwin/fs.h>		/* For BLKGETSIZE64 */
-#else
-#include <linux/fs.h>		/* For BLKGETSIZE64 */
+#elif defined(__linux__)
+#include <linux/fs.h>       /* for BLKGETSIZE64 */
+#elif defined(__FreeBSD_kernel__)
+#include <sys/disk.h>       /* for DIOCGMEDIASIZE */
 #endif
-#endif
+
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -247,10 +249,16 @@ enum futil_file_err futil_map_file(int fd, int writeable,
 		return FILE_ERR_STAT;
 	}
 
-#ifndef HAVE_MACOS
-	if (S_ISBLK(sb.st_mode))
+	if (S_ISBLK(sb.st_mode)) {
+#ifdef BLKGETSIZE64
+		/* Linux, Cygwin */
 		ioctl(fd, BLKGETSIZE64, &sb.st_size);
 #endif
+#ifdef DIOCGMEDIASIZE
+		/* FreeBSD */
+		ioctl(fd, DIOCGMEDIASIZE, &sb.st_size);
+#endif
+	}
 
 	/* If the image is larger than 2^32 bytes, it's wrong. */
 	if (sb.st_size < 0 || sb.st_size > UINT32_MAX) {
