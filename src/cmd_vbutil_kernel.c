@@ -10,13 +10,15 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <inttypes.h>		/* For PRIu64 */
-#ifndef HAVE_MACOS
-#ifdef __CYGWIN__
+
+#if defined(__CYGWIN__)
 #include <cygwin/fs.h>		/* For BLKGETSIZE64 */
-#else
-#include <linux/fs.h>		/* For BLKGETSIZE64 */
+#elif defined(__linux__)
+#include <linux/fs.h>       /* for BLKGETSIZE64 */
+#elif defined(__FreeBSD_kernel__)
+#include <sys/disk.h>       /* for DIOCGMEDIASIZE */
 #endif
-#endif
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -185,13 +187,18 @@ static uint8_t *ReadOldKPartFromFileOrDie(const char *filename,
 		Fatal("Unable to stat %s: %s\n", filename, strerror(errno));
 
 	if (S_ISBLK(statbuf.st_mode)) {
-#ifndef HAVE_MACOS
 		int fd = open(filename, O_RDONLY);
 		if (fd >= 0) {
+#ifdef BLKGETSIZE64
+			/* Linux, Cygwin */
 			ioctl(fd, BLKGETSIZE64, &file_size);
+#endif
+#ifdef DIOCGMEDIASIZE
+			/* FreeBSD */
+			ioctl(fd, DIOCGMEDIASIZE, &file_size);
+#endif
 			close(fd);
 		}
-#endif
 	} else {
 		file_size = statbuf.st_size;
 	}

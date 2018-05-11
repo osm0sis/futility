@@ -6,7 +6,7 @@
 #define VBOOT_REFERENCE_UTILITY_CGPT_CGPT_H_
 
 #include <fcntl.h>
-#ifndef HAVE_MACOS
+#ifdef __linux__
 #include <features.h>
 #endif
 #include <stdint.h>
