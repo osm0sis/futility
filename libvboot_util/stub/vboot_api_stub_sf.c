@@ -5,7 +5,11 @@
  * Stub implementations of firmware-provided API functions.
  */
 
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __linux__
+#include <features.h> /* for __GLIBC__ */
+#endif
+
+#ifdef __GLIBC__
 #include <execinfo.h>
 #endif
 #include <stdint.h>
@@ -28,7 +32,7 @@ struct alloc_node {
 	struct alloc_node *next;
 	void *ptr;
 	size_t size;
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __GLIBC__
 	void *bt_buffer[MAX_STACK_LEVELS];
 	int bt_levels;
 #endif
@@ -36,7 +40,7 @@ struct alloc_node {
 
 static struct alloc_node *alloc_head;
 
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __GLIBC__
 static void print_stacktrace(void)
 {
 	void *buffer[MAX_STACK_LEVELS];
@@ -63,7 +67,7 @@ void *VbExMalloc(size_t size)
 	node->next = alloc_head;
 	node->ptr = p;
 	node->size = size;
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __GLIBC__
 	node->bt_levels = backtrace(node->bt_buffer, MAX_STACK_LEVELS);
 #endif
 	alloc_head = node;
@@ -94,7 +98,7 @@ void VbExFree(void *ptr)
 	} else {
 		fprintf(stderr, "\n>>>>>> Invalid VbExFree() %p\n", ptr);
 		fflush(stderr);
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __GLIBC__
 		print_stacktrace();
 #endif
 		/*
@@ -128,7 +132,7 @@ int vboot_api_stub_check_memory(void)
 		next = node->next;
 		fprintf(stderr, "\nptr=%p, size=%zd\n", node->ptr, node->size);
 		fflush(stderr);
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#ifdef __GLIBC__
 		backtrace_symbols_fd(node->bt_buffer + 1, node->bt_levels - 1,
 				     2);
 #endif
