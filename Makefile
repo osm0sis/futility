@@ -10,7 +10,7 @@ EXE = .exe
 RM = del
 endif
 
-CFLAGS = -ffunction-sections -O3 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
+CFLAGS = -ffunction-sections -fcommon -O3 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
 INC = \
 	-Iinclude \
 	-Iinclude/futility \
